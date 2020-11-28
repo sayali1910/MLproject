@@ -1,0 +1,14 @@
+{
+    "editor.formatOnSave": true,
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.pylintPath": "pylint",
+    "python.linting.pylintArgs": [
+        "--load-plugins",
+        "pylint_django"
+    ],
+    "python.linting.pylintEnabled": true,
+    "python.venvPath": "C:\\Users\\Sayali Kanase\\Desktop\\djreact\\backend\\env\\Scripts\\python",
+    "python.linting.pycodestyleArgs": [
+        "--ignore=E501"
+    ]
+}
