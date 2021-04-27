@@ -1,66 +1,71 @@
 import pandas as pd
-from numpy import *
-import numpy as np
-from sklearn import preprocessing
-from sklearn import datasets, linear_model
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn import metrics
-from sklearn.cross_validation import train_test_split
+from sklearn import linear_model
 from sklearn.model_selection import train_test_split
-from sklearn import neighbors
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
 
-data =pd.read_csv('train dataset.csv')
+data =pd.read_csv('Train16.csv')
 array = data.values
-
-for i in range(len(array)):
-	if array[i][0]=="Male":
-		array[i][0]=1
-	else:
-		array[i][0]=0
-
-
 df=pd.DataFrame(array)
 
-maindf =df[[0,1,2,3,4,5,6]]
+maindf =df[[0,1,2,3,4,5,6,7]]
 mainarray=maindf.values
-print (mainarray)
 
-
-temp=df[7]
+temp=df[8]
 train_y =temp.values
-# print(train_y)
-# print(mainarray)
 train_y=temp.values
 
 for i in range(len(train_y)):
+    
 	train_y[i] =str(train_y[i])
 
 
+X_train, X_test, y_train, y_test = train_test_split(mainarray, train_y, test_size=0.50, random_state=1, stratify=train_y)
 
+#Logistic Regression
 mul_lr = linear_model.LogisticRegression(multi_class='multinomial', solver='newton-cg',max_iter =1000)
 mul_lr.fit(mainarray, train_y)
 
-testdata =pd.read_csv('test dataset.csv')
-test = testdata.values
+pred=mul_lr.predict(X_test)
 
-for i in range(len(test)):
-	if test[i][0]=="Male":
-		test[i][0]=1
-	else:
-		test[i][0]=0
+print("Confusion Matrix for Logistic Regression:")
+mat=confusion_matrix(y_test, pred)
+print(mat)
 
+print("Accuracy:")
+print(accuracy_score(y_test, pred))
 
-df1=pd.DataFrame(test)
+print("Precision:")
+print(precision_score(y_test, pred,average='macro'))
 
-testdf =df1[[0,1,2,3,4,5,6]]
-maintestarray=testdf.values
-print(maintestarray)
+print("Recall:")
+print(recall_score(y_test, pred,average='macro'))
+  
+    
+#KNN
+neigh = KNeighborsClassifier(n_neighbors=3)
+neigh.fit(mainarray, train_y)
 
-y_pred = mul_lr.predict(maintestarray)
-for i in range(len(y_pred)) :
-	y_pred[i]=str((y_pred[i]))
-DF = pd.DataFrame(y_pred,columns=['Predicted Personality'])
-DF.index=DF.index+1
-DF.index.names = ['Person No']
-DF.to_csv("output.csv")
+pred1=neigh.predict(X_test)
 
+print("\nConfusion Matrix for KNN:")
+mat=confusion_matrix(y_test, pred1)
+print(mat)
+
+print("Accuracy:")
+print(accuracy_score(y_test, pred1))
+
+print("Precision:")
+print(precision_score(y_test, pred1,average='macro'))
+
+print("Recall:")
+print(recall_score(y_test, pred1,average='macro'))
+
+from joblib import dump, load
+dump(mul_lr, 'code.joblib')
+
+loaded_classifier = load('code.joblib')
+loaded_classifier.score(X_test,y_test)
